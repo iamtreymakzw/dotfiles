@@ -9,7 +9,6 @@ tap "getsentry/tools"
 # -------------------------------------------------------------------
 brew "awscli"
 brew "biome"
-brew "bun"
 brew "commitizen"
 brew "eza"
 brew "glab"              # GitLab CLI (replaces gh)

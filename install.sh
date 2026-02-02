@@ -115,7 +115,19 @@ for pkg in "${npm_globals[@]}"; do
 done
 
 # -------------------------------------------------------------------
-# 9. Tmux Plugin Manager
+# 9. Bun
+# -------------------------------------------------------------------
+header "Bun"
+if command -v bun &>/dev/null; then
+    ok "Already installed ($(bun --version))"
+else
+    info "Installing Bun..."
+    curl -fsSL https://bun.sh/install | bash
+    ok "Bun installed"
+fi
+
+# -------------------------------------------------------------------
+# 10. Tmux Plugin Manager
 # -------------------------------------------------------------------
 header "Tmux Plugin Manager"
 TPM_DIR="$HOME/.tmux/plugins/tpm"
@@ -128,7 +140,7 @@ else
 fi
 
 # -------------------------------------------------------------------
-# 10. Tmux Gruvbox theme
+# 11. Tmux Gruvbox theme
 # -------------------------------------------------------------------
 header "Tmux Gruvbox Theme"
 TMUX_THEME_DIR="$HOME/.config/tmux/themes/gruvbox"
@@ -142,7 +154,7 @@ else
 fi
 
 # -------------------------------------------------------------------
-# 11. VS Code extensions
+# 12. VS Code extensions
 # -------------------------------------------------------------------
 header "VS Code Extensions"
 if command -v code &>/dev/null; then
@@ -152,7 +164,7 @@ else
 fi
 
 # -------------------------------------------------------------------
-# 12. Cursor extensions
+# 13. Cursor extensions
 # -------------------------------------------------------------------
 header "Cursor Extensions"
 if command -v cursor &>/dev/null; then
@@ -162,7 +174,7 @@ else
 fi
 
 # -------------------------------------------------------------------
-# 13. macOS defaults
+# 14. macOS defaults
 # -------------------------------------------------------------------
 header "macOS System Defaults"
 read -p "Apply macOS defaults (keyboard speed, Finder, Dock, etc.)? [y/N] " -n 1 -r
@@ -172,7 +184,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 # -------------------------------------------------------------------
-# 14. SSH key
+# 15. SSH key
 # -------------------------------------------------------------------
 header "SSH Key"
 if [ -f "$HOME/.ssh/id_ed25519" ]; then
@@ -204,7 +216,7 @@ SSHEOF
 fi
 
 # -------------------------------------------------------------------
-# 15. GitLab CLI auth
+# 16. GitLab CLI auth
 # -------------------------------------------------------------------
 header "GitLab CLI (glab)"
 if command -v glab &>/dev/null; then
