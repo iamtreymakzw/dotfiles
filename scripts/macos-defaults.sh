@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Sensible macOS defaults for a dev machine
 # Run once on a fresh install, then log out/restart
-set -euo pipefail
+set -uo pipefail
 
 info() { printf "\033[0;34m[info]\033[0m %s\n" "$1"; }
 

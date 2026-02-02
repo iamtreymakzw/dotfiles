@@ -183,7 +183,7 @@ header "macOS System Defaults"
 read -p "Apply macOS defaults (keyboard speed, Finder, Dock, etc.)? [y/N] " -n 1 -r < /dev/tty
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    bash "$DOTFILES/scripts/macos-defaults.sh"
+    bash "$DOTFILES/scripts/macos-defaults.sh" || true
 fi
 
 # -------------------------------------------------------------------
