@@ -178,7 +178,7 @@ fi
 # 14. macOS defaults
 # -------------------------------------------------------------------
 header "macOS System Defaults"
-read -p "Apply macOS defaults (keyboard speed, Finder, Dock, etc.)? [y/N] " -n 1 -r
+read -p "Apply macOS defaults (keyboard speed, Finder, Dock, etc.)? [y/N] " -n 1 -r < /dev/tty
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     bash "$DOTFILES/scripts/macos-defaults.sh"
@@ -192,7 +192,7 @@ if [ -f "$HOME/.ssh/id_ed25519" ]; then
     ok "SSH key already exists"
 else
     info "Generating a new SSH key..."
-    read -p "Enter your work email for the SSH key: " ssh_email
+    read -p "Enter your work email for the SSH key: " ssh_email < /dev/tty
     ssh-keygen -t ed25519 -C "$ssh_email" -f "$HOME/.ssh/id_ed25519"
     eval "$(ssh-agent -s)"
     ssh-add --apple-use-keychain "$HOME/.ssh/id_ed25519"

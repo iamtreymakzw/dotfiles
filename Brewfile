@@ -8,7 +8,6 @@ tap "getsentry/tools"
 # -------------------------------------------------------------------
 brew "awscli"
 brew "biome"
-brew "commitizen"
 brew "eza"
 brew "glab"              # GitLab CLI (replaces gh)
 brew "git"
@@ -44,7 +43,7 @@ cask "font-symbols-only-nerd-font"
 # -------------------------------------------------------------------
 cask "betterdisplay"
 cask "cursor"
-cask "docker"
+cask "docker-desktop"
 cask "figma"
 cask "ghostty"
 cask "imageoptim"
