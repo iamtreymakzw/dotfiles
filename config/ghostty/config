@@ -1,0 +1,30 @@
+
+font-family = JetBrainsMono Nerd Font
+font-size = 13
+theme = Gruvbox Dark Hard
+
+window-padding-x = 5
+window-padding-y = 0
+
+window-decoration = true
+
+cursor-style=block
+
+adjust-cell-height = 35%
+
+title = " "
+
+mouse-scroll-multiplier = 2
+
+window-colorspace = "display-p3"
+
+copy-on-select = clipboard
+
+window-padding-balance = true
+
+window-save-state = always
+
+macos-titlebar-style = transparent
+
+keybind = ctrl+r=reload_config
+keybind = shift+enter=text:\x1b\r

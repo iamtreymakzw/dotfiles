@@ -1,0 +1,86 @@
+[
+  // Navigation between panes
+  {
+    "context": "Workspace",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown"
+    }
+  },
+
+  // Normal mode bindings
+  {
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      // File/Buffer navigation
+      "space space": "file_finder::Toggle",
+      "space ,": "tab_switcher::Toggle",
+      "space e": "workspace::ToggleLeftDock",
+      "space b d": "pane::CloseActiveItem",
+      "space b o": "pane::CloseOtherItems",
+
+      // Splits
+      "s h": "pane::SplitRight",
+      "s v": "pane::SplitDown",
+
+      // Code actions
+      "space c a": "editor::ToggleCodeActions",
+      "space c r": "editor::Rename",
+      "space c s": "outline::Toggle",
+      "shift-k": "editor::Hover",
+
+      // Refactoring
+      "space r n": "editor::Rename",
+      "space r r": "editor::ToggleCodeActions",
+
+      // Go to
+      "space g d": "editor::GoToDefinition",
+      "space g r": "editor::FindAllReferences",
+      "space g i": "editor::GoToImplementation",
+      "space g g": "git_panel::ToggleFocus",
+
+      // Search
+      "space s g": "pane::DeploySearch",
+
+      // Multi-cursor
+      "ctrl-n": "editor::SelectNext",
+
+      // Debug
+      "space d b": "editor::ToggleBreakpoint",
+      "space d c": "debugger::Continue",
+      "space d o": "debugger::StepOver",
+      "space d t": "debugger::Stop",
+      "space d a": "debugger::Start"
+    }
+  },
+
+  // Visual mode bindings
+  {
+    "context": "Editor && vim_mode == visual",
+    "bindings": {
+      "ctrl-n": "editor::SelectNext",
+      "shift-j": "editor::MoveLineDown",
+      "shift-k": "editor::MoveLineUp",
+
+      // Refactoring (select code first)
+      "space r r": "editor::ToggleCodeActions"
+    }
+  },
+
+  // Project panel (file explorer) bindings
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "a": "project_panel::NewFile",
+      "shift-a": "project_panel::NewDirectory",
+      "r": "project_panel::Rename",
+      "d": "project_panel::Delete",
+      "x": "project_panel::Cut",
+      "c": "project_panel::Copy",
+      "p": "project_panel::Paste",
+      "enter": "project_panel::Open"
+    }
+  }
+]

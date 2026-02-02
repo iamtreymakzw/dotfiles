@@ -1,0 +1,88 @@
+{
+  "window.zoomLevel": 1,
+  "editor.formatOnSave": true,
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "breadcrumbs.enabled": false,
+  "editor.renderWhitespace": "none",
+  "workbench.statusBar.visible": false,
+  "editor.fontFamily": "'JetBrainsMono Nerd Font', Menlo, 'Courier New', monospace",
+  "workbench.activityBar.location": "hidden",
+  "workbench.sideBar.location": "right",
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "terminal.integrated.stickyScroll.enabled": false,
+  "editor.stickyScroll.enabled": false,
+  "editor.hideCursorInOverviewRuler": true,
+  "workbench.editor.tabActionCloseVisibility": false,
+  "explorer.decorations.colors": false,
+  "explorer.compactFolders": false,
+  "git.decorations.enabled": false,
+  "editor.bracketPairColorization.enabled": false,
+  "editor.guides.highlightActiveBracketPair": false,
+  "editor.guides.bracketPairsHorizontal": false,
+  "editor.renderLineHighlight": "none",
+  "editor.scrollbar.horizontal": "hidden",
+  "editor.scrollbar.vertical": "hidden",
+  "editor.showFoldingControls": "never",
+  "editor.glyphMargin": false,
+  "editor.folding": false,
+  "workbench.layoutControl.enabled": false,
+  "window.title": " ",
+  "editor.cursorBlinking": "solid",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "workbench.editor.showTabs": "single",
+  "window.commandCenter": false,
+  "editor.occurrencesHighlight": "off",
+  "editor.matchBrackets": false,
+  "editor.minimap.enabled": false,
+  "scm.diffDecorationsGutterPattern": {
+    "added": false,
+    "modified": false
+  },
+  "scm.diffDecorations": "none",
+  "scm.diffDecorationsGutterAction": "none",
+  "files.autoSave": "onWindowChange",
+  "workbench.colorTheme": "Gruvbox Dark Hard",
+  "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', Menlo, 'Courier New', monospace",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+    "source.fixAll.format": "always",
+    "source.fixAll.ts": "always"
+  },
+  "workbench.iconTheme": "symbols",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "eslint.probe": [
+    "astro",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "html",
+    "mdx",
+    "vue",
+    "markdown",
+    "json",
+    "jsonc"
+  ],
+  "workbench.tree.enableStickyScroll": false,
+  "workbench.startupEditor": "none",
+  "editor.fontSize": 13
+}
