@@ -62,7 +62,7 @@ fi
 # -------------------------------------------------------------------
 header "Brew Bundle (apps & tools)"
 info "Installing from Brewfile..."
-brew bundle --file="$DOTFILES/Brewfile" --no-lock
+brew bundle --file="$DOTFILES/Brewfile"
 
 # -------------------------------------------------------------------
 # 5. Create common directories
