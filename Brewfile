@@ -1,5 +1,4 @@
 # Taps
-tap "homebrew/bundle"
 tap "symfony-cli/tap"
 tap "mutagen-io/mutagen"
 tap "getsentry/tools"
