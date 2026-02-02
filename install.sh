@@ -106,6 +106,7 @@ fi
 header "Global npm packages"
 npm_globals=(
     typescript
+    yarn
     commitizen
     cz-conventional-changelog
 )
