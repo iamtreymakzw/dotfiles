@@ -89,7 +89,9 @@ bash "$DOTFILES/scripts/symlinks.sh"
 # -------------------------------------------------------------------
 header "Node.js (via NVM)"
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+mkdir -p "$NVM_DIR"
+# Source NVM from Homebrew install location
+[ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && \. "$(brew --prefix)/opt/nvm/nvm.sh"
 if command -v nvm &>/dev/null; then
     info "Installing latest LTS Node..."
     nvm install --lts
