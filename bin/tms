@@ -1,0 +1,276 @@
+#!/usr/bin/env bash
+# tms - one tmux session per repo checkout (main repo or git worktree),
+# each with an editor, a Claude Code and a shell window.
+set -euo pipefail
+
+SELF="${BASH_SOURCE[0]}"
+ROOT="${TMS_ROOT:-$HOME/Developer}"
+WT_SUFFIX="-wt"
+EDIT_WINDOW="edit"
+CLAUDE_WINDOW="claude"
+SHELL_WINDOW="shell"
+EDIT_CMD="${TMS_EDIT_CMD:-nvim}"
+CLAUDE_CMD="${TMS_CLAUDE_CMD:-claude}"
+DOCK_WIDTH="${TMS_DOCK_WIDTH:-50%}"
+PREVIEW='git -C {2} -c color.status=always status -sb | head -20; echo; git -C {2} log --oneline --color=always -8'
+
+usage() {
+  cat <<EOF
+tms                     pick any repo or worktree under $ROOT
+tms <path>              open (or switch to) the session for a directory
+tms wt                  pick a worktree of the current repo
+tms new [branch] [base] create a worktree in <repo>$WT_SUFFIX/ and open it (base defaults to HEAD)
+tms rm                  remove a worktree of the current repo and its session
+tms window <name> <session-id> <dir>   jump to the editor or Claude wherever it is, creating it if missing
+tms dock <session-id> <dir>            toggle Claude between its own window and a pane beside the current one
+
+In a picker: enter opens, ctrl-x kills that session.
+EOF
+}
+
+die() {
+  printf 'tms: %s\n' "$*" >&2
+  if [[ -n "${TMS_POPUP:-}" ]]; then
+    read -rsn1 -p 'press any key to close' || true
+  fi
+  exit 1
+}
+
+main_repo() {
+  local common
+  common="$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || return 1
+  dirname "$common"
+}
+
+# my-app for the main checkout, my-app/phone-fix for a worktree
+session_name() {
+  local dir="$1" main top name
+  if main="$(main_repo "$dir")"; then
+    top="$(git -C "$dir" rev-parse --show-toplevel)"
+    name="$(basename "$main")"
+    if [[ "$top" != "$main" ]]; then
+      name="$name/$(basename "$top")"
+    fi
+  else
+    name="$(basename "$dir")"
+  fi
+  printf '%s' "${name//[.:]/_}"
+}
+
+list_checkouts() {
+  local repo
+  for repo in "$ROOT"/*/; do
+    repo="${repo%/}"
+    [[ -d "$repo/.git" ]] || continue
+    git -C "$repo" worktree list --porcelain | awk '
+      /^worktree /  { path = substr($0, 10) }
+      /^branch /    { sub("refs/heads/", "", $2); print path "\t" $2 }
+      /^detached$/  { print path "\t(detached)" }'
+  done
+}
+
+# Rows are "<display>\t<path>"; live sessions are starred and sorted first.
+rows() {
+  local filter="${1:-}" sessions path branch name mark order
+  sessions="$(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)"
+  list_checkouts | while IFS=$'\t' read -r path branch; do
+    [[ -d "$path" ]] || continue
+    if [[ -n "$filter" && "$(main_repo "$path")" != "$filter" ]]; then
+      continue
+    fi
+    name="$(session_name "$path")"
+    mark=' ' order=1
+    if grep -qxF -- "$name" <<<"$sessions"; then
+      mark='*' order=0
+    fi
+    printf '%s\t%s %-42s %s\t%s\n' "$order" "$mark" "$name" "$branch" "$path"
+  done | LC_ALL=C sort -t$'\t' -k1,1 -k2,2 | cut -f2-
+}
+
+# Reads rows on stdin, prints the chosen path.
+pick() {
+  local header="$1" reload="$2"
+  fzf --delimiter '\t' --with-nth 1 --reverse --header "$header" \
+    --preview "$PREVIEW" --preview-window 'right,50%' \
+    --bind "ctrl-x:execute-silent($SELF kill {2})+reload($reload)" | cut -f2
+}
+
+# Panes are tagged with a role so the editor and Claude can be found whether
+# they sit in their own window or share one.
+ROLE_OPTION="@tms_role"
+
+tag_pane() {
+  tmux set-option -p -t "$1" "$ROLE_OPTION" "$2"
+}
+
+# Pane id of a role in a session; adopts the pane of a same-named window from older sessions.
+role_pane() {
+  local session="$1" role="$2" pane
+  pane="$(tmux list-panes -s -t "$session" -F "#{pane_id} #{$ROLE_OPTION}" 2>/dev/null \
+    | awk -v role="$role" '$2 == role { print $1; exit }')"
+  if [[ -z "$pane" ]]; then
+    pane="$(tmux list-panes -t "$session:=$role" -F '#{pane_id}' 2>/dev/null | head -1)" || true
+    [[ -n "$pane" ]] && tag_pane "$pane" "$role"
+  fi
+  printf '%s' "$pane"
+}
+
+focus_pane() {
+  tmux select-window -t "$1"
+  tmux select-pane -t "$1"
+}
+
+ensure_session() {
+  local dir="$1" name
+  name="$(session_name "$dir")"
+  if tmux has-session -t "=$name" 2>/dev/null; then
+    return 0
+  fi
+  tmux new-session -d -s "$name" -n "$EDIT_WINDOW" -c "$dir"
+  tag_pane "=$name:=$EDIT_WINDOW" "$EDIT_WINDOW"
+  tmux send-keys -t "=$name:=$EDIT_WINDOW" "$EDIT_CMD" C-m
+  tmux new-window -d -t "=$name:" -n "$CLAUDE_WINDOW" -c "$dir"
+  tag_pane "=$name:=$CLAUDE_WINDOW" "$CLAUDE_WINDOW"
+  tmux send-keys -t "=$name:=$CLAUDE_WINDOW" "$CLAUDE_CMD" C-m
+  tmux new-window -d -t "=$name:" -n "$SHELL_WINDOW" -c "$dir"
+}
+
+switch_to() {
+  local name
+  name="$(session_name "$1")"
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "=$name"
+  else
+    tmux attach-session -t "=$name"
+  fi
+}
+
+open_dir() {
+  [[ -d "$1" ]] || die "no such directory: $1"
+  ensure_session "$1"
+  switch_to "$1"
+}
+
+cmd_pick() {
+  local filter="${1:-}" header="$2" path
+  path="$(rows "$filter" | pick "$header" "$SELF rows $(printf '%q' "$filter")")" || exit 0
+  [[ -n "$path" ]] || exit 0
+  open_dir "$path"
+}
+
+add_worktree() {
+  local wt="$1" branch="$2" base="$3"
+  if git show-ref --verify --quiet "refs/heads/$branch"; then
+    git worktree add "$wt" "$branch"
+  elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+    git worktree add --track -b "$branch" "$wt" "origin/$branch"
+  else
+    git worktree add -b "$branch" "$wt" "$base"
+  fi
+}
+
+# Untracked env files do not come along with a new worktree.
+copy_env() {
+  local from="$1" to="$2" file
+  for file in "$from"/.env*; do
+    if [[ -f "$file" && ! -e "$to/$(basename "$file")" ]]; then
+      cp "$file" "$to/"
+    fi
+  done
+}
+
+install_deps() {
+  local dir="$1" target
+  target="=$(session_name "$dir"):=$SHELL_WINDOW"
+  if [[ -f "$dir/bun.lock" || -f "$dir/bun.lockb" ]]; then
+    tmux send-keys -t "$target" 'bun install' C-m
+  elif [[ -f "$dir/package-lock.json" ]]; then
+    tmux send-keys -t "$target" 'npm install' C-m
+  fi
+}
+
+cmd_new() {
+  local branch="${1:-}" base="${2:-HEAD}" main wt
+  main="$(main_repo "$PWD")" || die "not inside a git repo"
+  if [[ -z "$branch" ]]; then
+    read -rp 'new worktree branch: ' branch
+  fi
+  [[ -n "$branch" ]] || exit 0
+  wt="${main}${WT_SUFFIX}/${branch//\//-}"
+  if [[ ! -d "$wt" ]]; then
+    add_worktree "$wt" "$branch" "$base" || die "git worktree add failed"
+    copy_env "$main" "$wt"
+    ensure_session "$wt"
+    install_deps "$wt"
+  fi
+  open_dir "$wt"
+}
+
+cmd_rm() {
+  local main path answer name
+  main="$(main_repo "$PWD")" || die "not inside a git repo"
+  path="$(rows "$main" | awk -F'\t' -v main="$main" '$2 != main' \
+    | pick 'remove worktree' "$SELF rows $(printf '%q' "$main")")" || exit 0
+  [[ -n "$path" ]] || exit 0
+  read -rp "remove $path (branch is kept)? [y/N] " answer
+  [[ "$answer" == "y" ]] || exit 0
+  name="$(session_name "$path")"
+  git -C "$main" worktree remove "$path" || die "not removed"
+  tmux kill-session -t "=$name" 2>/dev/null || true
+}
+
+cmd_window() {
+  local name="$1" session="$2" dir="$3" cmd="" pane
+  pane="$(role_pane "$session" "$name")"
+  if [[ -n "$pane" ]]; then
+    focus_pane "$pane"
+    return 0
+  fi
+  case "$name" in
+    "$EDIT_WINDOW") cmd="$EDIT_CMD" ;;
+    "$CLAUDE_WINDOW") cmd="$CLAUDE_CMD" ;;
+  esac
+  tmux new-window -t "$session:" -n "$name" -c "$dir"
+  if [[ -n "$cmd" ]]; then
+    tag_pane "$session:=$name" "$name"
+    tmux send-keys -t "$session:=$name" "$cmd" C-m
+  fi
+}
+
+# Claude beside the editor to watch it work, or back in its own window for room to read.
+cmd_dock() {
+  local session="$1" dir="$2" claude host
+  claude="$(role_pane "$session" "$CLAUDE_WINDOW")"
+  if [[ -z "$claude" ]]; then
+    cmd_window "$CLAUDE_WINDOW" "$session" "$dir"
+    claude="$(role_pane "$session" "$CLAUDE_WINDOW")"
+  fi
+  if [[ "$(tmux display-message -p -t "$claude" '#{window_panes}')" -gt 1 ]]; then
+    host="$(tmux display-message -p -t "$claude" '#{window_id}')"
+    tmux break-pane -d -a -s "$claude" -t "$host" -n "$CLAUDE_WINDOW"
+    return 0
+  fi
+  host="$(tmux display-message -p -t "$session" '#{window_id}')"
+  if [[ "$host" == "$(tmux display-message -p -t "$claude" '#{window_id}')" ]]; then
+    host="$(role_pane "$session" "$EDIT_WINDOW")"
+    [[ -n "$host" ]] || die "no editor window to put Claude beside"
+    tmux select-window -t "$host"
+  fi
+  tmux join-pane -h -l "$DOCK_WIDTH" -s "$claude" -t "$host"
+}
+
+case "${1:-}" in
+  "") cmd_pick "" 'repos and worktrees  (* = live session, ctrl-x kills it)' ;;
+  wt)
+    repo="$(main_repo "$PWD")" || die "not inside a git repo"
+    cmd_pick "$repo" "worktrees of $(basename "$repo")"
+    ;;
+  new) cmd_new "${2:-}" "${3:-}" ;;
+  rm) cmd_rm ;;
+  window) cmd_window "$2" "$3" "$4" ;;
+  dock) cmd_dock "$2" "$3" ;;
+  rows) rows "${2:-}" ;;
+  kill) tmux kill-session -t "=$(session_name "$2")" 2>/dev/null || true ;;
+  -h | --help | help) usage ;;
+  *) open_dir "$(cd "$1" 2>/dev/null && pwd || printf '%s' "$1")" ;;
+esac

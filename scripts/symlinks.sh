@@ -42,7 +42,18 @@ link_file "$DOTFILES/config/ghostty/config" "$HOME/.config/ghostty/config"
 link_file "$DOTFILES/config/nvim" "$HOME/.config/nvim"
 
 # Tmux
-link_file "$DOTFILES/config/tmux/tmux.conf" "$HOME/.config/tmux/tmux.conf"
+link_file "$DOTFILES/config/tmux/tmux.conf"      "$HOME/.config/tmux/tmux.conf"
+link_file "$DOTFILES/config/tmux/themes/gruvbox" "$HOME/.config/tmux/themes/gruvbox"
+link_file "$DOTFILES/bin/tms"                    "$HOME/.local/bin/tms"
+
+# Desktop: AeroSpace, SketchyBar, JankyBorders
+link_file "$DOTFILES/config/aerospace/aerospace.toml" "$HOME/.config/aerospace/aerospace.toml"
+link_file "$DOTFILES/config/sketchybar"               "$HOME/.config/sketchybar"
+link_file "$DOTFILES/config/borders/bordersrc"        "$HOME/.config/borders/bordersrc"
+
+# Claude Code
+link_file "$DOTFILES/config/claude/settings.json"         "$HOME/.claude/settings.json"
+link_file "$DOTFILES/config/claude/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 
 # Starship
 link_file "$DOTFILES/config/starship/starship.toml" "$HOME/.config/starship.toml"

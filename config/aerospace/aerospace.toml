@@ -1,0 +1,224 @@
+# AeroSpace: tiling window manager. Guide: https://nikitabobko.github.io/AeroSpace/guide
+# The modifier is alt (Option). Reload after editing: alt-shift-; then esc.
+
+config-version = 2
+
+# SketchyBar and JankyBorders live and die with AeroSpace
+after-startup-command = [
+    'exec-and-forget sketchybar',
+    'exec-and-forget borders',
+]
+start-at-login = true
+auto-reload-config = false
+
+# Tell the bar which workspace, window and mode are current
+exec-on-workspace-change = ['/bin/bash', '-c',
+    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE',
+]
+on-focus-changed = ['exec-and-forget sketchybar --trigger aerospace_focus_change']
+on-mode-changed = ['exec-and-forget sketchybar --trigger aerospace_mode_change']
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+accordion-padding = 40
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+automatically-unhide-macos-hidden-apps = true
+focus-follows-mouse.enabled = false
+key-mapping.preset = 'qwerty'
+
+# Only these exist; the bar shows a workspace once it holds a window
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
+# Homebrew's folder on Intel and Apple-silicon Macs, so the commands above are found when launched at login
+[exec.env-vars]
+    PATH = '/usr/local/bin:/opt/homebrew/bin:${PATH}'
+
+# The top gap leaves room for SketchyBar (28) plus the same 8 as every other edge
+[gaps]
+    inner.horizontal = 8
+    inner.vertical =   8
+    outer.left =       8
+    outer.bottom =     8
+    outer.top =        36
+    outer.right =      8
+
+[mode.main.binding]
+    # Focus and move, with the same keys as Neovim and tmux
+    alt-h = 'focus left'
+    alt-j = 'focus down'
+    alt-k = 'focus up'
+    alt-l = 'focus right'
+    alt-shift-h = 'move left'
+    alt-shift-j = 'move down'
+    alt-shift-k = 'move up'
+    alt-shift-l = 'move right'
+
+    # Workspaces
+    alt-1 = 'workspace 1'
+    alt-2 = 'workspace 2'
+    alt-3 = 'workspace 3'
+    alt-4 = 'workspace 4'
+    alt-5 = 'workspace 5'
+    alt-6 = 'workspace 6'
+    alt-7 = 'workspace 7'
+    alt-8 = 'workspace 8'
+    alt-9 = 'workspace 9'
+    alt-shift-1 = ['move-node-to-workspace 1', 'workspace 1']
+    alt-shift-2 = ['move-node-to-workspace 2', 'workspace 2']
+    alt-shift-3 = ['move-node-to-workspace 3', 'workspace 3']
+    alt-shift-4 = ['move-node-to-workspace 4', 'workspace 4']
+    alt-shift-5 = ['move-node-to-workspace 5', 'workspace 5']
+    alt-shift-6 = ['move-node-to-workspace 6', 'workspace 6']
+    alt-shift-7 = ['move-node-to-workspace 7', 'workspace 7']
+    alt-shift-8 = ['move-node-to-workspace 8', 'workspace 8']
+    alt-shift-9 = ['move-node-to-workspace 9', 'workspace 9']
+    alt-tab = 'workspace-back-and-forth'
+    alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+
+    # Layout
+    alt-f = 'fullscreen'
+    alt-shift-f = 'layout floating tiling'
+    alt-slash = 'layout tiles horizontal vertical'
+    alt-comma = 'layout accordion horizontal vertical'
+    alt-minus = 'resize smart -60'
+    alt-equal = 'resize smart +60'
+    alt-shift-equal = 'balance-sizes'
+
+    alt-enter = 'exec-and-forget open -na Ghostty'
+
+    alt-shift-semicolon = 'mode service'
+
+# Rarely needed commands, behind alt-shift-; so they cost no everyday keys
+[mode.service.binding]
+    esc = ['reload-config', 'exec-and-forget sketchybar --reload', 'mode main']
+    r = ['flatten-workspace-tree', 'mode main']
+    f = ['layout floating tiling', 'mode main']
+    b = ['balance-sizes', 'mode main']
+    backspace = ['close-all-windows-but-current', 'mode main']
+    alt-shift-h = ['join-with left', 'mode main']
+    alt-shift-j = ['join-with down', 'mode main']
+    alt-shift-k = ['join-with up', 'mode main']
+    alt-shift-l = ['join-with right', 'mode main']
+
+# ---------- Where apps open ----------
+# 1 terminal   2 browser   3 editors   4 talk   5 office   6 tools
+
+[[on-window-detected]]
+    if.app-id = 'com.mitchellh.ghostty'
+    run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+    if.app-id = 'company.thebrowser.Browser'
+    run = 'move-node-to-workspace 2'
+[[on-window-detected]]
+    if.app-id = 'com.google.Chrome'
+    run = 'move-node-to-workspace 2'
+[[on-window-detected]]
+    if.app-id = 'com.apple.Safari'
+    run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
+    if.app-id = 'dev.zed.Zed'
+    run = 'move-node-to-workspace 3'
+[[on-window-detected]]
+    if.app-id = 'dev.zed.Zed-Preview'
+    run = 'move-node-to-workspace 3'
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.VSCode'
+    run = 'move-node-to-workspace 3'
+[[on-window-detected]]
+    if.app-id = 'com.jetbrains.WebStorm'
+    run = 'move-node-to-workspace 3'
+[[on-window-detected]]
+    if.app-id = 'com.apple.dt.Xcode'
+    run = 'move-node-to-workspace 3'
+[[on-window-detected]]
+    if.app-id = 'com.google.android.studio'
+    run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+    if.app-id = 'com.tinyspeck.slackmacgap'
+    run = 'move-node-to-workspace 4'
+[[on-window-detected]]
+    if.app-id = 'com.hnc.Discord'
+    run = 'move-node-to-workspace 4'
+[[on-window-detected]]
+    if.app-id = 'net.whatsapp.WhatsApp'
+    run = 'move-node-to-workspace 4'
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.teams2'
+    run = 'move-node-to-workspace 4'
+[[on-window-detected]]
+    if.app-id = 'us.zoom.xos'
+    run = 'move-node-to-workspace 4'
+[[on-window-detected]]
+    if.app-id = 'com.anthropic.claudefordesktop'
+    run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.Outlook'
+    run = 'move-node-to-workspace 5'
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.Word'
+    run = 'move-node-to-workspace 5'
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.Excel'
+    run = 'move-node-to-workspace 5'
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.Powerpoint'
+    run = 'move-node-to-workspace 5'
+[[on-window-detected]]
+    if.app-id = 'com.microsoft.to-do-mac'
+    run = 'move-node-to-workspace 5'
+[[on-window-detected]]
+    if.app-id = 'hc.hcengineering.Huly'
+    run = 'move-node-to-workspace 5'
+
+[[on-window-detected]]
+    if.app-id = 'com.figma.Desktop'
+    run = 'move-node-to-workspace 6'
+[[on-window-detected]]
+    if.app-id = 'com.mongodb.compass'
+    run = 'move-node-to-workspace 6'
+[[on-window-detected]]
+    if.app-id = 'com.install4j.0526-4458-1435-8154.837'
+    run = 'move-node-to-workspace 6'
+[[on-window-detected]]
+    if.app-id = 'app.yaak.desktop'
+    run = 'move-node-to-workspace 6'
+[[on-window-detected]]
+    if.app-id = 'com.DanPristupov.Fork'
+    run = 'move-node-to-workspace 6'
+[[on-window-detected]]
+    if.app-id = 'com.github.GitHubClient'
+    run = 'move-node-to-workspace 6'
+
+# ---------- Apps that should float, not tile ----------
+[[on-window-detected]]
+    if.app-id = 'com.apple.systempreferences'
+    run = 'layout floating'
+[[on-window-detected]]
+    if.app-id = 'com.apple.finder'
+    run = 'layout floating'
+[[on-window-detected]]
+    if.app-id = 'com.raycast.macos'
+    run = 'layout floating'
+[[on-window-detected]]
+    if.app-id = 'com.apple.calculator'
+    run = 'layout floating'
+[[on-window-detected]]
+    if.app-id = 'com.philandro.anydesk'
+    run = 'layout floating'
+[[on-window-detected]]
+    if.app-id = 'com.teamviewer.TeamViewer'
+    run = 'layout floating'
+[[on-window-detected]]
+    if.app-id = 'com.parallels.desktop.console'
+    run = 'layout floating'
+[[on-window-detected]]
+    if.app-id = 'com.philipyoungg.session-direct'
+    run = 'layout floating'

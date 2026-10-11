@@ -1,0 +1,104 @@
+#!/bin/zsh
+
+# SketchyBar: a powerline bar in the same grammar as the tmux bar at the bottom of the terminal.
+#   accent block | workspace ribbon | front app          volume | battery | date | time
+# Workspaces and the mode indicator come from AeroSpace (see ~/.config/aerospace/aerospace.toml).
+
+source "$CONFIG_DIR/colors.sh"
+source "$CONFIG_DIR/icons.sh"
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+FONT="JetBrainsMono Nerd Font"
+HEIGHT=28
+TEXT_SIZE=13.0
+# The powerline cap is drawn as a glyph; this size makes it exactly as tall as the bar
+CAP_SIZE=21.0
+CAP_Y=0
+WORKSPACES=(1 2 3 4 5 6 7 8 9)
+
+sketchybar --bar position=top height=$HEIGHT color=$BG0 margin=0 y_offset=0 corner_radius=0 \
+                 border_width=0 shadow=off padding_left=0 padding_right=0 sticky=on
+
+sketchybar --default \
+  icon.font="$FONT:Bold:$TEXT_SIZE" label.font="$FONT:Bold:$TEXT_SIZE" \
+  icon.color=$FG label.color=$FG \
+  padding_left=0 padding_right=0 \
+  icon.padding_left=0 icon.padding_right=0 label.padding_left=0 label.padding_right=0 \
+  background.height=$HEIGHT background.corner_radius=0 background.drawing=off \
+  updates=when_shown
+
+# cap <name> <side> <glyph colour> <background colour> [glyph]
+# The left-pointing glyph's ink stops half a point short of its advance, which shows as a hairline of the
+# cap's own background. Trimming the icon's right padding by one closes it.
+cap() {
+  local overlap=0
+  [[ "$2" == right ]] && overlap=-1
+  sketchybar --add item "$1" "$2" \
+             --set "$1" icon="${5:-$SEP}" icon.font="$FONT:Regular:$CAP_SIZE" icon.y_offset=$CAP_Y \
+                        icon.color="$3" background.color="$4" background.drawing=on label.drawing=off \
+                        icon.padding_right=$overlap
+}
+
+sketchybar --add event aerospace_workspace_change \
+           --add event aerospace_focus_change \
+           --add event aerospace_mode_change
+
+# ---------- left: mode block, workspaces, front app ----------
+sketchybar --add item mode left \
+           --set mode icon="$ICON_APPLE" icon.color=$BG0 label.color=$BG0 \
+                      icon.padding_left=12 icon.padding_right=10 label.padding_right=10 label.drawing=off \
+                      background.color=$YELLOW background.drawing=on \
+                      script="$PLUGIN_DIR/mode.sh" \
+           --subscribe mode aerospace_mode_change
+cap mode.cap left $YELLOW $BG1
+
+for ws in $WORKSPACES; do
+  cap space.$ws.l left $BG1 $BG1
+  sketchybar --add item space.$ws left \
+             --set space.$ws icon="$ws" icon.padding_left=8 icon.padding_right=7 \
+                             label.font="$FONT:Regular:14.0" label.padding_right=8 \
+                             background.color=$BG1 background.drawing=on \
+                             click_script="PATH=/usr/local/bin:/opt/homebrew/bin:\$PATH aerospace workspace $ws"
+  cap space.$ws.r left $BG1 $BG1
+done
+cap spaces.end left $BG1 $BG0
+
+# One hidden item redraws the whole ribbon whenever AeroSpace reports a change
+sketchybar --add item spaces left \
+           --set spaces drawing=off updates=on update_freq=15 script="$PLUGIN_DIR/spaces.sh" \
+           --subscribe spaces aerospace_workspace_change aerospace_focus_change front_app_switched
+
+sketchybar --add item front_app left \
+           --set front_app icon.padding_left=10 icon.padding_right=8 icon.color=$MUTED label.color=$FG \
+                           script="$PLUGIN_DIR/front_app.sh" \
+           --subscribe front_app front_app_switched
+
+# ---------- right: added from the screen edge inwards ----------
+sketchybar --add item clock right \
+           --set clock icon="$ICON_CLOCK" icon.color=$BG0 label.color=$BG0 \
+                       icon.padding_left=10 icon.padding_right=7 label.padding_right=12 \
+                       background.color=$YELLOW background.drawing=on \
+                       update_freq=20 script="$PLUGIN_DIR/clock.sh"
+cap clock.cap right $YELLOW $BG1 "$SEP_L"
+
+sketchybar --add item date right \
+           --set date icon="$ICON_CALENDAR" icon.padding_left=10 icon.padding_right=7 label.padding_right=10 \
+                      background.color=$BG1 background.drawing=on \
+                      update_freq=300 script="$PLUGIN_DIR/date.sh"
+cap date.cap right $BG1 $BG2 "$SEP_L"
+
+sketchybar --add item battery right \
+           --set battery icon.padding_left=10 icon.padding_right=7 label.padding_right=10 \
+                         background.color=$BG2 background.drawing=on \
+                         update_freq=120 script="$PLUGIN_DIR/battery.sh" \
+           --subscribe battery system_woke power_source_change
+cap battery.cap right $BG2 $BG1 "$SEP_L"
+
+sketchybar --add item volume right \
+           --set volume icon.padding_left=10 icon.padding_right=7 label.padding_right=10 \
+                        background.color=$BG1 background.drawing=on \
+                        script="$PLUGIN_DIR/volume.sh" \
+           --subscribe volume volume_change
+cap volume.cap right $BG1 $BG0 "$SEP_L"
+
+sketchybar --update

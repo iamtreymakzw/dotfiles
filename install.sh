@@ -143,17 +143,15 @@ else
 fi
 
 # -------------------------------------------------------------------
-# 11. Tmux Gruvbox theme
+# 11. Claude Code
 # -------------------------------------------------------------------
-header "Tmux Gruvbox Theme"
-TMUX_THEME_DIR="$HOME/.config/tmux/themes/gruvbox"
-if [ -d "$TMUX_THEME_DIR" ]; then
+header "Claude Code"
+if command -v claude &>/dev/null || [ -x "$HOME/.local/bin/claude" ]; then
     ok "Already installed"
 else
-    info "Cloning tmux gruvbox theme..."
-    mkdir -p "$HOME/.config/tmux/themes"
-    git clone https://github.com/egel/tmux-gruvbox "$TMUX_THEME_DIR"
-    ok "Gruvbox theme installed"
+    info "Installing Claude Code..."
+    curl -fsSL https://claude.ai/install.sh | bash
+    ok "Claude Code installed (run: claude, then /plugin to add mattpocock-skills)"
 fi
 
 # -------------------------------------------------------------------
@@ -245,6 +243,8 @@ echo "  2. Fill in placeholders: git config --global user.email 'you@company.com
 echo "  3. Authenticate GitLab: glab auth login --hostname gitlab.yourcompany.com"
 echo "  4. Open tmux and press prefix + I to install tmux plugins"
 echo "  5. Open Neovim - Lazy.nvim will auto-install plugins"
+echo "  5a. Open AeroSpace once and grant it Accessibility; set the menu bar to auto-hide"
+echo "  5b. Run claude, log in, and install the mattpocock-skills plugin"
 echo "  6. Sign into your apps (Slack, Chrome, Zoom, etc.)"
 echo "  7. Sign into Google services in Chrome (Gmail, Calendar, Drive, Meet)"
 echo ""

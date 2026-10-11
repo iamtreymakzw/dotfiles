@@ -1,22 +1,5 @@
 format = """
-$directory\
-$git_branch\
-$git_status\
-$fill\
-$php\
-$python\
-$lua\
-$nodejs\
-$golang\
-$haskell\
-$rust\
-$ruby\
-$aws\
-$docker_context\
-$jobs\
-$cmd_duration\
-$line_break\
-$character"""
+$directory$git_branch$git_status$fill$package$bun$python$lua$nodejs$golang$haskell$rust$ruby$php$java$kotlin$swift$dart$deno$dotnet$elixir$zig$c$aws$gcloud$azure$docker_context$kubernetes$terraform$helm$pulumi$vagrant$jobs$cmd_duration$line_break$character"""
 
 add_newline = true
 
@@ -68,10 +51,6 @@ symbol = ' '
 style = 'orange'
 symbol = ' '
 
-[php]
-style = 'fg:#8892BF'
-symbol = ' '
-
 [bun]
 style = "brown"
 symbol = ' '
@@ -83,17 +62,90 @@ symbol = ' '
 [package]
 symbol = '󰏗 '
 
+[php]
+symbol = ' '
+style = 'fg:#8892BF'
+
+[java]
+symbol = ' '
+style = 'fg:#ED8B00'
+
+[kotlin]
+symbol = ' '
+style = 'fg:#7F52FF'
+
+[swift]
+symbol = ' '
+style = 'fg:#FA7343'
+
+[dart]
+symbol = ' '
+style = 'fg:#0175C2'
+
+[deno]
+symbol = ' '
+style = 'fg:#70FFAF'
+
+[dotnet]
+symbol = ' '
+style = 'fg:#512BD4'
+
+[elixir]
+symbol = ' '
+style = 'fg:#6E4A7E'
+
+[zig]
+symbol = ' '
+style = 'fg:#F7A41D'
+
+[c]
+symbol = ' '
+style = 'fg:#A8B9CC'
+
 [aws]
-symbol = ' '
+symbol = ' '
 style = 'yellow'
 format = '[$symbol($profile )(\[$duration\] )]($style)'
 
 [docker_context]
-symbol = ' '
+symbol = ' '
 style = 'fg:#06969A'
 format = '[$symbol]($style) $path'
 detect_files = ['docker-compose.yml', 'docker-compose.yaml', 'Dockerfile']
 detect_extensions = ['Dockerfile']
+
+[kubernetes]
+symbol = '󱃾 '
+style = 'fg:#326CE5'
+disabled = false
+format = '[$symbol$context( \($namespace\)) ]($style)'
+
+[terraform]
+symbol = '󱁢 '
+style = 'fg:#844FBA'
+
+[helm]
+symbol = '⎈ '
+style = 'fg:#0F1689'
+
+[gcloud]
+symbol = '󱇆 '
+style = 'fg:#4285F4'
+format = '[$symbol($account)(@$domain)(\($region\)) ]($style)'
+
+[azure]
+symbol = '󰠅 '
+style = 'fg:#0078D4'
+format = '[$symbol($subscription) ]($style)'
+disabled = false
+
+[pulumi]
+symbol = '󰰮 '
+style = 'fg:#8A3391'
+
+[vagrant]
+symbol = ' '
+style = 'fg:#1868F2'
 
 [jobs]
 symbol = ' '
@@ -112,9 +164,9 @@ format = '([$all_status$ahead_behind]($style) )'
 ahead = ' ⇡ ${count}'
 diverged = ' ⇕⇡ ${ahead_count}⇣${behind_count}'
 behind = ' ⇣ ${count}'
-conflicted = ' '
-staged = ' '
-modified = ' '
+conflicted = ' '
+staged = ' '
+modified = ' '
 renamed = ' 󰁕'
 deleted = ' ✖'
-untracked = ' '
+untracked = ' '

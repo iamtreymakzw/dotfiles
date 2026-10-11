@@ -2,6 +2,8 @@
 tap "symfony-cli/tap"
 tap "mutagen-io/mutagen"
 tap "getsentry/tools"
+tap "nikitabobko/tap"
+tap "felixkratz/formulae"
 
 # -------------------------------------------------------------------
 # CLI Tools
@@ -9,7 +11,11 @@ tap "getsentry/tools"
 brew "awscli"
 brew "biome"
 brew "eza"
-brew "glab"              # GitLab CLI (replaces gh)
+brew "felixkratz/formulae/borders"     # Window borders (started by AeroSpace)
+brew "felixkratz/formulae/sketchybar"  # Top bar (started by AeroSpace)
+brew "fzf"               # Picker used by tms
+brew "gh"                # GitHub counts in the tmux bar
+brew "glab"              # GitLab CLI
 brew "git"
 brew "git-lfs"
 brew "k6"
@@ -22,6 +28,7 @@ brew "php"               # PHP 8.x
 brew "phrase-cli"        # Phrase translation CLI
 brew "pipx"
 brew "python@3.13"
+brew "jq"                # Claude Code status line
 brew "ripgrep"
 brew "sentry-cli"        # Sentry CLI
 brew "starship"
@@ -41,6 +48,7 @@ cask "font-symbols-only-nerd-font"
 # -------------------------------------------------------------------
 # GUI Applications - Dev Tools
 # -------------------------------------------------------------------
+cask "nikitabobko/tap/aerospace"  # Tiling window manager
 cask "betterdisplay"
 cask "cursor"
 cask "docker-desktop"

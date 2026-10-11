@@ -49,9 +49,9 @@ return {
 		config = function()
 			require("incline").setup({
 				highlight = {
-					-- Use Gruvbox colors for active/inactive tabs
+					-- Same block colours as the statusline, tmux bar and Claude Code row
 					groups = {
-						InclineNormal = { guibg = "#282828", guifg = "#ebdbb2" }, -- dark background, light fg
+						InclineNormal = { guibg = "#3c3836", guifg = "#ebdbb2" },
 						InclineNormalNC = { guibg = "none", guifg = "#a89984" },
 					},
 				},

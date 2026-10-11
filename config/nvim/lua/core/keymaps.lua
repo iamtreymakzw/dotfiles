@@ -65,8 +65,8 @@ vim.keymap.set('n', '<leader>lw', '<cmd>set wrap!<CR>', opts)
 vim.keymap.set('v', '<', '<gv', opts)
 vim.keymap.set('v', '>', '>gv', opts)
 
--- Keep last yanked when pasting
-vim.keymap.set('v', 'p', '"_dP', opts)
+-- Keep last yanked when pasting (visual P does this natively and also works on the last word of a line)
+vim.keymap.set('v', 'p', 'P', opts)
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', function()
